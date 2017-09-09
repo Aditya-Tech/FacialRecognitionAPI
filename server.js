@@ -13,8 +13,6 @@ var express = require('express'),
 AWS.config = new AWS.Config();
 AWS.config.accessKeyId = process.env.ACCESSKEY;
 AWS.config.secretAccessKey = process.env.SECRET;
-// AWS.config.accessKeyId = "AKIAJVW3SYKKCFEMP6ZA";
-// AWS.config.secretAccessKey = "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";
 var rekognition = new AWS.Rekognition({region : "us-east-1"});
 
 const MongoClient = require('mongodb').MongoClient
@@ -85,7 +83,7 @@ app.post("/register", function(req, res) {
                 console.log("Created new patient record for id: " + faceId);
               }
             });
-            res.status(300).json(faceId);    // Tells the client that the user still must enter information
+            res.status(300).json({"token" : faceId});    // Tells the client that the user still must enter information
           } else {              // If patient exists, return information
             console.log("Found patient: ");
             console.log(doc);
