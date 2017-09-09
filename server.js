@@ -1,5 +1,6 @@
 var express = require('express'),
   app = express(),
+  cors = require('cors'),
   bodyParser = require('body-parser'),
   mongodb = require("mongodb"),
   ObjectID = mongodb.ObjectID,
@@ -10,6 +11,7 @@ var express = require('express'),
   path = require('path');
 
 
+app.use(cors());
 AWS.config = new AWS.Config();
 AWS.config.accessKeyId = process.env.S3_KEY;
 AWS.config.secretAccessKey = process.env.S3_SECRET;
@@ -61,13 +63,13 @@ app.post("/register", function(req, res) {
     "DetectionAttributes" : ["ALL"],
     "Image" : {
       "Bytes" : new Buffer(req.body.image, 'base64')
-    } 
+    }
   }, function(err, data) {
     if (err) {
       console.log("Error connecting to Rekognition " + err);
       process.exit(1);
     } else {
-      var faceId = data.FaceRecords[0].Face.ImageId;      
+      var faceId = data.FaceRecords[0].Face.ImageId;
       console.log("Face Id is: " + faceId);
 
       // Query database to check if patient exists
@@ -122,4 +124,3 @@ app.put("/editPatient/:id", function(req, res) {
     }
   });
 });
-
