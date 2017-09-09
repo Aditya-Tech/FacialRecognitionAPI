@@ -10,6 +10,11 @@ var express = require('express'),
   path = require('path');
 
 
+let s3 = new aws.S3({
+  accessKeyId: process.env.S3_KEY,
+  secretAccessKey: process.env.S3_SECRET
+});
+
 var rekognition = new AWS.Rekognition({region : "us-east-1"});
 
 const MongoClient = require('mongodb').MongoClient
@@ -61,7 +66,6 @@ app.post("/register", function(req, res) {
   }, function(err, data) {
     if (err) {
       console.log("Error connecting to Rekognition " + err);
-      process.exit(1);
     } else {
       var faceId = data.FaceRecords[0].Face.ImageId;      
       console.log("Face Id is: " + faceId);
@@ -90,16 +94,6 @@ app.post("/register", function(req, res) {
       });
     }
   });
-
-});
-
-/**
- * Format of PUT 
- * { id: 29343248383484, fields..  }
- * 
- */
-app.put("/register", function(req, res){
-  // If id dosent exist, return an error, otherwise update record
 
 
 });
