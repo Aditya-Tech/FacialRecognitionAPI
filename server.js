@@ -39,7 +39,7 @@ function handleError(res, reason, message, code) {
 
 
 app.get("/getAllPatients", function(req, res) {
-	db.collection("patiant-data").find({}).toArray(function(err, docs) {
+	db.collection("patient-data").find({}).toArray(function(err, docs) {
     if (err) {
       handleError(res, err.message, "Failed to get patients.");
     } else {
@@ -95,7 +95,7 @@ app.post("/register", function(req, res) {
 
 
 app.get("/recognize/:id", function(req, res) {
-	db.collection("patients").findOne({ _id: new ObjectID(req.params.id) }, function(err, doc) {
+	db.collection("patient-data").findOne({ _id: new ObjectID(req.params.id) }, function(err, doc) {
     if (err) {
       handleError(res, err.message, "Failed to get patient");
     } else {
@@ -109,7 +109,7 @@ app.put("/editPatient/:id", function(req, res) {
   var updated = req.body;
   delete updated;
 
-  db.collection("patients").updateOne({_id: new ObjectID(req.params.id)}, updated, function(err, doc) {
+  db.collection("patient-data").updateOne({_id: new ObjectID(req.params.id)}, updated, function(err, doc) {
     if (err) {
       handleError(res, err.message, "Failed to update patient");
     } else {
