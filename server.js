@@ -1,5 +1,6 @@
 var express = require('express'),
   app = express(),
+  cors = require('cors'),
   bodyParser = require('body-parser'),
   mongodb = require("mongodb"),
   ObjectID = mongodb.ObjectID,
@@ -10,6 +11,7 @@ var express = require('express'),
   path = require('path');
 
 
+app.use(cors());
 AWS.config = new AWS.Config();
 AWS.config.accessKeyId = process.env.ACCESSKEY;
 AWS.config.secretAccessKey = process.env.SECRET;
@@ -107,9 +109,7 @@ app.post("/register", function(req, res) {
           }
         });
       }
-
-      
-      
+            
     }
   });
   
@@ -140,4 +140,3 @@ app.put("/editPatient/:id", function(req, res) {
     }
   });
 });
-
