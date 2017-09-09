@@ -3,8 +3,14 @@ var express = require('express'),
   bodyParser = require('body-parser'),
   mongodb = require("mongodb"),
   ObjectID = mongodb.ObjectID,
-  db;
+  db,
+  AWS = require('aws-sdk'),
+  uuid = require('node-uuid'),
+  fs = require('fs-extra'),
+  path = require('path');
 
+
+var rekognition = new AWS.Rekognition({region : "us-east-1"});
 
 const MongoClient = require('mongodb').MongoClient
 
@@ -33,7 +39,7 @@ function handleError(res, reason, message, code) {
 
 
 app.get("/getAllPatients", function(req, res) {
-	db.collection("patients").find({}).toArray(function(err, docs) {
+	db.collection("patiant-data").find({}).toArray(function(err, docs) {
     if (err) {
       handleError(res, err.message, "Failed to get patients.");
     } else {
@@ -43,22 +49,40 @@ app.get("/getAllPatients", function(req, res) {
 });
 
 
-app.post("/register/:id", function(req, res) {
-	db.collection("patients").findOne({ _id: new ObjectID(req.params.id) }, function(err, doc) {
-	    if (err) {
-	      handleError(res, err.message, "Failed to get patient");
-	    } else {
-	    	var patient_info = req.body;
-		  	patient_info.createDate = new Date();
-		  	db.collection("patients").insertOne(patient_info, function(err, doc) {
-			    if (err) {
-			      handleError(res, err.message, "Failed to create new patient.");
-			    } else {
-			      res.status(201).json(doc.ops[0]);
-			    }
-		  	});
-	    }
-  	});
+app.post("/register", function(req, res) {
+
+  // Connect to AWS rekognition
+  rekognition.indexFaces({
+    "CollectionId" : "TestCollection",
+    "DetectionAttributes" : ["ALL"],
+    "Image" : {
+      "Bytes" : new Buffer(req.body.image, 'base64')
+    } 
+  }, function(err, data) {
+    if (err) {
+      console.log("Error connecting to Rekognition " + err);
+    } else {
+      var faceId = data.FaceRecords[0].Face.ImageId;      
+      console.log("Face Id is: " + faceId);
+
+      // Query database to check if patient exists
+      db.collection("patient-data").findOne({_id : faceId}, function(err, doc) {
+        if (err) {
+          console.log("Error connecting to collection " + err);
+          res.status(500);
+        } else {
+          if (doc == null) {    // If patient doesn't exist, return an error cde
+            res.status(500);
+          } else {              // If patient exists, return information
+            console.log("Found patient: " + doc);
+            res.status(200).json(doc);
+          }
+        }
+      });
+    }
+  });
+
+  
 });
 
 
