@@ -54,46 +54,65 @@ app.get("/getAllPatients", function(req, res) {
 
 app.post("/register", function(req, res) {
 
-  // Connect to AWS rekognition
-  rekognition.indexFaces({
+  // Begin by checking if a user exists
+  rekognition.searchFacesByImage({
     "CollectionId" : "TestCollection",
-    "DetectionAttributes" : ["ALL"],
+    "FaceMatchThreshold" : 70,
     "Image" : {
       "Bytes" : new Buffer(req.body.image, 'base64')
-    } 
+    }
   }, function(err, data) {
-    if (err) {
-      console.log("Error connecting to Rekognition " + err);
-      process.exit(1);
-    } else {
-      var faceId = data.FaceRecords[0].Face.ImageId;      
-      console.log("Face Id is: " + faceId);
-
-      // Query database to check if patient exists
-      db.collection("patient-data").findOne({_id : faceId}, function(err, doc) {
-        if (err) {
-          console.log("Error connecting to collection " + err);
-          res.status(500);
-        } else {
-          if (doc == null) {    // If patient doesn't exist, create a new record and return the id
-            db.collection("patient-data").insertOne({_id : faceId}, function(err, doc) {
-              if (err) {
-                console.log("Error creating patient! " + err);
-              } else {
-                console.log("Created new patient record for id: " + faceId);
-              }
-            });
-            res.status(300).json({"token" : faceId});    // Tells the client that the user still must enter information
-          } else {              // If patient exists, return information
-            console.log("Found patient: ");
-            console.log(doc);
-            res.status(200).json(doc);
+    console.log(data)
+    if (data) {
+      // If patient doesn't exist
+      console.log(data.FaceMatches.length)
+      if (data.FaceMatches.length === 0) {
+        rekognition.indexFaces({
+          "CollectionId" : "TestCollection",
+          "DetectionAttributes" : ["ALL"],
+          "Image" : {
+            "Bytes" : new Buffer(req.body.image, 'base64')
           }
+        }, function(err, data) {          
+          if (err) {
+            console.log("Error adding patient to Rekognition " + err);
+            process.exit(1);
+          } else {
+            var newId = data.FaceRecords[0].Face.ImageId;
+            db.collection("patient-data").insertOne({_id : newId}, function(err) {
+              if (err) {
+                console.log("Error adding patient! " + err);
+                process.exit(1);
+              }
+              
+              res.status(300).json({"token" : newId });
+            });            
+          }
+        });        
+      } else {
+
+        for (var i = 0; i < data.FaceMatches.length; i++) {   // Print out similar faces for reference
+          console.log(data.FaceMatches[i].Face);
+          console.log(data.FaceMatches[i].Face.Confidence);        
         }
-      });
+  
+        var matchedFaceId = data.FaceMatches[0].Face.ImageId;  // Get image id of most similar face, we'll use this to query db
+        db.collection("patient-data").findOne({_id : matchedFaceId}, function(err, doc) {
+          if (err) {
+            console.log("Error connecting to mongodb " + err);
+            process.exit(1);
+          } else {
+            console.log(data.FaceMatches[0].Face.Confidence);
+            res.send(doc)
+          }
+        });
+      }
+
+      
+      
     }
   });
-
+  
 
 });
 
