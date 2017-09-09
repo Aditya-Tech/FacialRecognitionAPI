@@ -1,14 +1,11 @@
 var express = require('express'),
   app = express(),
-  // port = process.env.PORT || 8000,
-  //mongoose = require('mongoose'),
   bodyParser = require('body-parser'),
+  ObjectID = mongodb.ObjectID,
   db;
 
+
 const MongoClient = require('mongodb').MongoClient
-  
-// mongoose.Promise = global.Promise;
-// mongoose.connect('mongodb://localhost/Patientdb'); 
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
@@ -19,40 +16,31 @@ MongoClient.connect("mongodb://aditya:aditya@ds129374.mlab.com:29374/patiant-dat
     process.exit(1);
   }
 
-  // Save database object from the callback for reuse.
   db = database;
   console.log("Database connection ready");
 
-  // Initialize the app.
   var server = app.listen(process.env.PORT || 8080, function () {
     var port = server.address().port;
     console.log("App now running on port", port);
   });
 });
 
-
-// var routes = require('./api/routes/RecognitionRoutes');
-// routes(app);
-
-// app.listen(port);
-// console.log('API Running on port : ' + port);
-
-// CONTACTS API ROUTES BELOW
-
-// Generic error handler used by all endpoints.
 function handleError(res, reason, message, code) {
   console.log("ERROR: " + reason);
   res.status(code || 500).json({"error": message});
 }
 
-/*  "/contacts"
- *    GET: finds all contacts
- *    POST: creates a new contact
- */
 
-app.get("/register", function(req, res) {
-	res.json("hello")
+app.get("/getAllPatients", function(req, res) {
+	db.collection("patients").find({}).toArray(function(err, docs) {
+    if (err) {
+      handleError(res, err.message, "Failed to get contacts.");
+    } else {
+      res.status(200).json(docs);
+    }
+  });
 });
+
 
 app.post("/register", function(req, res) {
 	var patient_info = req.body;
@@ -67,12 +55,29 @@ app.post("/register", function(req, res) {
   	});
 });
 
-/*  "/contacts/:id"
- *    GET: find contact by id
- *    PUT: update contact by id
- *    DELETE: deletes contact by id
- */
 
 app.get("/recognize/:id", function(req, res) {
+	db.collection("patients").findOne({ _id: new ObjectID(req.params.id) }, function(err, doc) {
+    if (err) {
+      handleError(res, err.message, "Failed to get contact");
+    } else {
+      res.status(200).json(doc);
+    }
+  });
+});
+
+
+
+app.put("/contacts/:id", function(req, res) {
+  var updated = req.body;
+  delete updated;
+
+  db.collection("patients").updateOne({_id: new ObjectID(req.params.id)}, updated, function(err, doc) {
+    if (err) {
+      handleError(res, err.message, "Failed to update contact");
+    } else {
+      res.status(204).end();
+    }
+  });
 });
 
