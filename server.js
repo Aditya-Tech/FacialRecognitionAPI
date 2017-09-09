@@ -71,10 +71,18 @@ app.post("/register", function(req, res) {
           console.log("Error connecting to collection " + err);
           res.status(500);
         } else {
-          if (doc == null) {    // If patient doesn't exist, return an error cde
-            res.status(500);
+          if (doc == null) {    // If patient doesn't exist, create a new record and return the id
+            db.collection("patient-data").insertOne({_id : faceId}, function(err, doc) {
+              if (err) {
+                console.log("Error creating patient! " + err);
+              } else {
+                console.log("Created new patient record for id: " + faceId);
+              }
+            });
+            res.status(300).json(faceId);    // Tells the client that the user still must enter information
           } else {              // If patient exists, return information
-            console.log("Found patient: " + doc);
+            console.log("Found patient: ");
+            console.log(doc);
             res.status(200).json(doc);
           }
         }
@@ -82,7 +90,7 @@ app.post("/register", function(req, res) {
     }
   });
 
-  
+
 });
 
 
