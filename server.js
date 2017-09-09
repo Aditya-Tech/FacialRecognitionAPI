@@ -1,6 +1,7 @@
 var express = require('express'),
   app = express(),
   bodyParser = require('body-parser'),
+  mongodb = require("mongodb"),
   ObjectID = mongodb.ObjectID,
   db;
 
@@ -42,15 +43,20 @@ app.get("/getAllPatients", function(req, res) {
 });
 
 
-app.post("/register", function(req, res) {
-	var patient_info = req.body;
-  	patient_info.createDate = new Date();
-
-  	db.collection("patients").insertOne(patient_info, function(err, doc) {
+app.post("/register/:id", function(req, res) {
+	db.collection("patients").findOne({ _id: new ObjectID(req.params.id) }, function(err, doc) {
 	    if (err) {
-	      handleError(res, err.message, "Failed to create new patient.");
+	      handleError(res, err.message, "Failed to get patient");
 	    } else {
-	      res.status(201).json(doc.ops[0]);
+	    	var patient_info = req.body;
+		  	patient_info.createDate = new Date();
+		  	db.collection("patients").insertOne(patient_info, function(err, doc) {
+			    if (err) {
+			      handleError(res, err.message, "Failed to create new patient.");
+			    } else {
+			      res.status(201).json(doc.ops[0]);
+			    }
+		  	});
 	    }
   	});
 });
