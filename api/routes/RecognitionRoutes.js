@@ -4,6 +4,6 @@ module.exports = function(app) {
 
   // todoList Routes
   app.route('/register')
-    .get(todoList.returnNewUserOrNot);
+    .get(getData.returnNewUserOrNot);
     .post(getData.createNewUser);
 };
