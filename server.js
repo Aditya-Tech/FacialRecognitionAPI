@@ -64,6 +64,7 @@ app.post("/register", function(req, res) {
   }, function(err, data) {
     if (err) {
       console.log("Error connecting to Rekognition " + err);
+      process.exit(1);
     } else {
       var faceId = data.FaceRecords[0].Face.ImageId;      
       console.log("Face Id is: " + faceId);
