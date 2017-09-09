@@ -11,8 +11,8 @@ var express = require('express'),
 
 
 AWS.config = new AWS.Config();
-AWS.config.accessKeyId = "AKIAJR72AWRD6TY4XFRA";
-AWS.config.secretAccessKey = "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";
+AWS.config.accessKeyId = "AKIAISIHVVMJPSWJGRFA";
+AWS.config.secretAccessKey = "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";
 var rekognition = new AWS.Rekognition({region : "us-east-1"});
 
 const MongoClient = require('mongodb').MongoClient
