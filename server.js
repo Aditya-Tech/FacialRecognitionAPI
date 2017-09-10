@@ -139,6 +139,25 @@ app.get("/recognize/:id", function(req, res) {
 });
 
 
+app.get("/reset", function(req, res) {
+  db.collection.remove("patient-data");
+  rekognition.deleteCollection({"CollectionId" : config.collectionName}, function(err, data) {
+    if (err) {
+      console.log(err);
+    } else {
+      console.log(data);
+    }
+  })
+
+  rekognition.createCollection( { "CollectionId": config.collectionName }, function(err, data) {
+    if (err) {
+    console.log(err, err.stack); // an error occurred
+    } else {
+    console.log(data);           // successful response
+    }
+  });
+}
+
 app.put("/editPatient/:id", function(req, res) {
   var updated = req.body;
   delete updated;
