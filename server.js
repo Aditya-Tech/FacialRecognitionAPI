@@ -141,7 +141,7 @@ app.get("/recognize/:id", function(req, res) {
 
 app.get("/reset", function(req, res) {
   db.collection("patient-data").remove();
-  rekognition.deleteCollection({"CollectionId" : config.collectionName}, function(err, data) {
+  rekognition.deleteCollection({"CollectionId" : TestCollection.collectionName}, function(err, data) {
     if (err) {
       console.log(err);
     } else {
@@ -149,7 +149,7 @@ app.get("/reset", function(req, res) {
     }
   })
 
-  rekognition.createCollection( { "CollectionId": config.collectionName }, function(err, data) {
+  rekognition.createCollection( { "CollectionId": TestCollection.collectionName }, function(err, data) {
     if (err) {
     console.log(err, err.stack); // an error occurred
     } else {
