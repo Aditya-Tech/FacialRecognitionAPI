@@ -119,7 +119,6 @@ app.post("/register", function(req, res) {
 app.put("/register", function(req, res) {
   console.log("req.body: " + req.body);
   console.log("req: " + req); 
-  console.log("req.body: " + {req.body});
   db.collection("patient-data").updateOne({_id : req.body.id}, req.body, function(err, data) {
     if (err) {
       console.log("There was an error updating a record " + err);
