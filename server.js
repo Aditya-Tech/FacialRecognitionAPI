@@ -131,7 +131,7 @@ app.put("/register", function(req, res) {
 
 
 app.get("/recognize/:id", function(req, res) {
-	db.collection("patient-data").findOne({ _id: new ObjectID(req.params.id) }, function(err, doc) {
+	db.collection("patient-data").findOne({ _id: req.params.id }, function(err, doc) {
     if (err) {
       handleError(res, err.message, "Failed to get patient");
     } else {
