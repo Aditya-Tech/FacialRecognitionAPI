@@ -140,7 +140,7 @@ app.get("/recognize/:id", function(req, res) {
 
 
 app.get("/reset", function(req, res) {
-  db.collection("patient-data").remove;
+  db.collection("patient-data").remove();
   rekognition.deleteCollection({"CollectionId" : config.collectionName}, function(err, data) {
     if (err) {
       console.log(err);
