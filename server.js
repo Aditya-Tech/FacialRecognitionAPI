@@ -87,7 +87,7 @@ app.post("/register", function(req, res) {
                 process.exit(1);
               }
               
-              res.status(300).json({"token" : newId });
+              res.status(300).json({"_id" : newId });
             });            
           }
         });        
