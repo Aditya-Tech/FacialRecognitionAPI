@@ -112,8 +112,18 @@ app.post("/register", function(req, res) {
             
     }
   });
-  
+});
 
+// Pass id of face via
+// { id : faceid, medications: something, etc }
+app.put("/register", function(req, res) {
+  db.collection("patient-data").updateOne({_id : req.body.id}, req.body, function(err, data) {
+    if (err) {
+      console.log("There was an error updating a record " + err);
+    } else {
+      res.send(true);
+    }
+  });
 });
 
 
