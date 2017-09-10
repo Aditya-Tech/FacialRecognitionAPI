@@ -156,7 +156,7 @@ app.get("/reset", function(req, res) {
     console.log(data);           // successful response
     }
   });
-}
+});
 
 app.put("/editPatient/:id", function(req, res) {
   var updated = req.body;
