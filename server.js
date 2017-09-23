@@ -13,8 +13,10 @@ var express = require('express'),
 
 app.use(cors());
 AWS.config = new AWS.Config();
-AWS.config.accessKeyId = process.env.ACCESSKEY;
-AWS.config.secretAccessKey = process.env.SECRET;
+// AWS.config.accessKeyId = process.env.ACCESSKEY;
+// AWS.config.secretAccessKey = process.env.SECRET;
+AWS.config.accessKeyId = process.env.AWS_ACCESS_KEY_ID;
+AWS.config.secretAccessKey = process.env.AWS_SECRET_ACCESS_KEY;
 var rekognition = new AWS.Rekognition({region : "us-east-1"});
 
 const MongoClient = require('mongodb').MongoClient
